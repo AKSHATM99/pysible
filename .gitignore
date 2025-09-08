@@ -1,0 +1,44 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Virtual environments
+venv/
+env/
+.venv/
+ENV/
+pysible_venv/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# dotenv files (secrets)
+.env
+.env.*
+
+# Redis dump file (if you use persistence)
+dump.rdb
+appendonly.aof
+
+# Test / coverage
+.coverage
+htmlcov/
+.pytest_cache/
+

@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pysible"
+version = "0.1.0"
+description = "Security library for FastAPI (RBAC, rate limiting, jwtAuth etc.)"
+authors = [{ name="Akshat Mishra", email="mails.akshat@gmail.com" }]
+dependencies = ["typer[all]", "redis", "fastapi[standard]"]
+
+[project.scripts]
+pysible = "pysible.cli:action"
