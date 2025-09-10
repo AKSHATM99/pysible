@@ -1,4 +1,5 @@
-📌 Pysible – Security Library for FastAPI
+![Pysible Banner](static/banner2.png)
+**<p align="center">📌 Pysible – Security Library for FastAPI</p>**
 
 Pysible is an open-source security library for FastAPI applications.
 It provides plug-and-play security features like authentication, authorization, API rate limiting, and logging with minimal boilerplate.
