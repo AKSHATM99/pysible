@@ -94,9 +94,7 @@ from fastapi import FastAPI, Depends
 from pysible.database import Data
 
 app = FastAPI()
-
-py_app = Data()
-py_app.load_data()
+Data().load_data()
 ```
 Here in this code we are using **load_data()** function which is coming from **Data** class which we are importing from **pysible.database** module.
 **If you want, you can add custom roles and users also the same way as shown below**
