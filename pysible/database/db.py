@@ -3,7 +3,7 @@ from .redis_client import redis_client
 class Data:
     def __init__(self):
         pass
-
+    
     def load_role(self):
         try:
             redis_client.hset("role:root", mapping={"name": "root"})
@@ -26,6 +26,7 @@ class Data:
         except Exception as e:
             return {f"Failed to load users {e}"}
 
+    @staticmethod
     def load_data(self):
         """
         This will load some initially required data like
@@ -41,6 +42,7 @@ class Data:
         except Exception as e:
             return {f"Failed to run LOAD DATA Function {e}"}
         
+    @staticmethod    
     def create_user(self, user_id: str, username: str, password: str, roles: list):
         for role in roles:
                 if not redis_client.hgetall(f"role:{role}"):
@@ -63,6 +65,7 @@ class Data:
         except Exception as e:
             return {f"Failed to add new user ⚠️ {e}"}
     
+    @staticmethod
     def create_role(self, role: str):
         if redis_client.keys(f"role:{role}"):
             print("⚠️ Role exists in db. No need to create one...")
