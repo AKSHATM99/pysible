@@ -4,13 +4,13 @@ from .token import Token
 class RBAC:
     """
     class methods to deal with RBAC.
-    Recieve "role" as a parameter and check with --> redis db
+    Recieve "roles" (list) as a parameter and check with --> redis db
     """
     def __init__(self) -> None:
         pass
     
     @staticmethod
-    def require_user(request: Request):
+    def require_token(request: Request):
         token = request.cookies.get("token")
         if not token:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired Token.")
@@ -19,8 +19,8 @@ class RBAC:
         return user_id
     
     @staticmethod
-    def required_role(roles: list):
-        def role_checker(cred_user_id: dict = Depends(RBAC.require_user)):
+    def require_role(roles: list):
+        def role_checker(cred_user_id: dict = Depends(RBAC.require_token)):
             for role in roles:
                 if role in redis_client.hget(f"user_id:{cred_user_id}", "roles").decode().split(","):
                     return cred_user_id

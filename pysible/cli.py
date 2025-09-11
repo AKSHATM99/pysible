@@ -8,7 +8,7 @@ app = typer.Typer()
 
 def starter(project_name) -> bool:
     try:
-        from pysible.database.redis_client import redis_client
+        from .database.redis_client import redis_client
         print("Loading .env \U0001F600")
         print("Loaded .env to system \u2713")
         print("Checking Redis Connection \U0001F600")
@@ -41,7 +41,7 @@ def action():
             redis_db_no = typer.prompt("Redis DB Number (e.g '0', '1'):->")
             want_dummy_data = typer.prompt("Want to load dummy data for testing ? ( yes / no ):->")
             if want_dummy_data=="yes":
-                from pysible.database.db import Data
+                from .database.db import Data
                 Data.load_data()
                 print("Loading default user & roles... ✅")
                 time.sleep(1)

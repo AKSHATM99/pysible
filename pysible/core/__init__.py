@@ -1,4 +1,8 @@
-from pysible.core.rbac import RBAC
-from pysible.core.auth import Auth
-from pysible.core.token import Token
+from .rbac import RBAC
+from .auth import Auth
+from .token import Token
+# from .pyrate import Pyrate  # if you have this too
+
+# optional: define __all__ for star imports
 __all__ = ["RBAC", "Auth", "Token"]
+
