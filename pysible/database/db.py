@@ -27,7 +27,7 @@ class Data:
             return {f"Failed to load users {e}"}
 
     @staticmethod
-    def load_data(self):
+    def load_data():
         """
         This will load some initially required data like
         roles - ["root", "admin", "user"]
@@ -43,7 +43,7 @@ class Data:
             return {f"Failed to run LOAD DATA Function {e}"}
         
     @staticmethod    
-    def create_user(self, user_id: str, username: str, password: str, roles: list):
+    def create_user(user_id: str, username: str, password: str, roles: list):
         for role in roles:
                 if not redis_client.hgetall(f"role:{role}"):
                     print(f"⚠️ Please add {role} as a role first then try adding user. Use 'create_role()' for adding {role} as a role.")
@@ -66,7 +66,7 @@ class Data:
             return {f"Failed to add new user ⚠️ {e}"}
     
     @staticmethod
-    def create_role(self, role: str):
+    def create_role(role: str):
         if redis_client.keys(f"role:{role}"):
             print("⚠️ Role exists in db. No need to create one...")
             return False
