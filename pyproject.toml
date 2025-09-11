@@ -11,3 +11,6 @@ dependencies = ["typer[all]", "redis", "fastapi[standard]"]
 
 [project.scripts]
 pysible = "pysible.cli:action"
+
+[tool.setuptools]
+packages = ["pysible"]
