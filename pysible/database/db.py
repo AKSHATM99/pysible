@@ -1,10 +1,8 @@
 from .redis_client import redis_client
 
 class Data:
-    def __init__(self):
-        pass
-    
-    def load_role(self):
+
+    def load_role():
         try:
             redis_client.hset("role:root", mapping={"name": "root"})
             redis_client.hset("role:admin", mapping={"name": "admin"})
@@ -13,7 +11,7 @@ class Data:
         except Exception as e:
             return {f"Failed to Load Role Data {e}"}
     
-    def load_user(self):
+    def load_user():
         try:
             redis_client.hset(
             "user_id:DFU1",
@@ -36,8 +34,8 @@ class Data:
         *** YOU CAN ADD NEW ROLES AND USERS ***
         """
         try:
-            self.load_role()
-            self.load_user()
+            Data.load_role()
+            Data.load_user()
             print("Added dafualt roles and user...")
         except Exception as e:
             return {f"Failed to run LOAD DATA Function {e}"}

@@ -13,18 +13,13 @@ def starter(project_name) -> bool:
         print("Loaded .env to system \u2713")
         print("Checking Redis Connection \U0001F600")
         time.sleep(1)
-        if redis_client.ping()!=None: 
-            from pysible.database.db import Data
+        if redis_client.ping()!=None:
             print("✅ Redis connection successful!")
             time.sleep(1)
             # Enable Append Only File
             redis_client.config_set("appendonly", "yes")
             redis_client.config_set("appendfsync", "everysec")
             print("AOF persistence enabled ✅")
-            time.sleep(1)
-            obj: object = Data()
-            obj.load_data()
-            print("Setting default Roles & Users ✅")
             time.sleep(1)
             return True
         if redis_client.ping()==None:
@@ -44,6 +39,12 @@ def action():
             redis_host = typer.prompt("Host of Redis (e.g 'localhost' if running locally):->")
             redis_port = typer.prompt("Port of Redis:->")
             redis_db_no = typer.prompt("Redis DB Number (e.g '0', '1'):->")
+            want_dummy_data = typer.prompt("Want to load dummy data for testing ? ( yes / no ):->")
+            if want_dummy_data=="yes":
+                from pysible.database.db import Data
+                Data.load_data()
+                print("Loading default user & roles... ✅")
+                time.sleep(1)
             # Create project folder
             os.makedirs(project_name, exist_ok=True)
             # Create .env file
