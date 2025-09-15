@@ -6,9 +6,10 @@ build-backend = "setuptools.build_meta"
 name = "pysible"
 version = "0.1.0"
 description = "Security library for FastAPI (RBAC, rate limiting, jwtAuth etc.)"
-Author= "Akshat Mishra"
-Author-email= "mails.akshat@gmail.com"
-dependencies = ["typer[all]", "redis", "fastapi[standard]", "python-jose"]
+authors = [
+  { name="Akshat Mishra", email="mails.akshat@gmail.com" }
+]
+dependencies = ["typer[all]", "redis", "fastapi[standard]", "python-jose", "python-dotenv"]
 
 [project.scripts]
 pysible = "pysible.cli:action"
