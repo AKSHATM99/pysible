@@ -1,29 +1,49 @@
-from pysible.database.redis_client import redis_client
+from ..database.redis_client import redis_client
 from fastapi.responses import JSONResponse
 from .token import Token
+from fastapi import HTTPException, status, Depends
+from ..logger import logger
 
 class Auth:
-    def __init__(self):
-        pass
-    
+
     @staticmethod
     def login(form_data):
-        keys = redis_client.keys("user_id:*")
-        user_ids = [key.decode().split("user_id:")[1] for key in keys]
-        if form_data.username in user_ids:
-            if form_data.password==redis_client.hget(f"user_id:{form_data.username}", "password").decode():
-                access_token = Token.create_token(form_data.username, form_data.password)
-                response = JSONResponse(content={"message": "Login Successful"})
-                response.set_cookie(key="token", value=access_token, httponly=True)
-                return response
-            else:
-                return "Wrong/Invalid Password !!!"
-        else:
-            return "User does not exists !!!"
+        user_key = f"user_id:{form_data.username}"
+        # Check if user exists
+        if not redis_client.exists(user_key):
+            logger.warning(f"Login failed | Username: {form_data.username} | Reason: user not found")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid username or password."
+            )
+        stored_password = redis_client.hget(user_key, "password")
+        if not stored_password:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid username or password."
+            )
+        access_token = Token.create_token(user_id=form_data.username)
+        response = JSONResponse(content={"message": "Login successful."})
+        response.set_cookie(
+            key="token",
+            value=access_token,
+            httponly=True,
+            secure=True,      # important for production
+            samesite="Strict" # prevents CSRF
+        )
+        logger.info(f"User '{form_data.username}' logged in successfully.")
+        return response
         
     @staticmethod
-    def logout():
-        response = JSONResponse(content={"message": "Logged out successfully"})
+    def logout(user_id: str ):
+        if not user_id:
+            logger.warning("Logout attempt without authentication.")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Authentication required. Please log in first."
+            )
+        response = JSONResponse(content={"message": f"User '{user_id}' logged out successfully."})
         response.delete_cookie(key="token")
+        logger.info(f"User '{user_id}' logged out successfully.")
         return response
             

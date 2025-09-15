@@ -1,6 +1,8 @@
 import time
 from ..database.redis_client import redis_client
-from fastapi import Request, HTTPException
+from fastapi import Request, HTTPException, Depends
+from .rbac import RBAC
+from ..logger import logger
 
 class PyRate:
 
@@ -25,6 +27,7 @@ class PyRate:
             tokens = min(burst, tokens + elapsed * rate)
 
             if tokens < 1:
+                logger.warning(f"'Too many requests' to endpoint: '{request.url.path}'")
                 raise HTTPException(status_code=429, detail="Too many requests")
 
             tokens -= 1

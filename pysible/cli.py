@@ -9,42 +9,38 @@ app = typer.Typer()
 def starter(project_name) -> bool:
     try:
         from .database.redis_client import redis_client
-        print("Loading .env \U0001F600")
-        print("Loaded .env to system \u2713")
-        print("Checking Redis Connection \U0001F600")
+        print("Loading .env ...")
+        print("Loaded .env to system...")
+        print("Checking Redis connection...")
         time.sleep(1)
         if redis_client.ping()!=None:
-            print("✅ Redis connection successful!")
+            print("Redis connection established successfully.")
             time.sleep(1)
             # Enable Append Only File
             redis_client.config_set("appendonly", "yes")
             redis_client.config_set("appendfsync", "everysec")
-            print("AOF persistence enabled ✅")
+            print("AOF persistence enabled.")
             time.sleep(1)
             return True
         if redis_client.ping()==None:
-            print("⚠️ Redis connection failed.")
+            print("Redis connection failed.")
             return False
     except Exception as e:
-        print("Connection Failed With Redis")
+        print("Unable to establish connection with Redis.")
         shutil.rmtree(project_name)
         raise e
 
 @app.command()
 def action():
     try:
-        project_name = typer.prompt("Project name:->")
-        is_redis = typer.prompt("Redis is running now? (yes/no):->")
+        project_name = typer.prompt("Project name:->").strip()
+        is_redis = typer.prompt("Is Redis currently running? (yes/no): ").strip().lower()
         if is_redis=="yes":
-            redis_host = typer.prompt("Host of Redis (e.g 'localhost' if running locally):->")
-            redis_port = typer.prompt("Port of Redis:->")
-            redis_db_no = typer.prompt("Redis DB Number (e.g '0', '1'):->")
-            want_dummy_data = typer.prompt("Want to load dummy data for testing ? ( yes / no ):->")
-            if want_dummy_data=="yes":
-                from .database.db import Data
-                Data.load_data()
-                print("Loading default user & roles... ✅")
-                time.sleep(1)
+            redis_host = typer.prompt("Enter the Redis host (e.g., 'localhost' for local instance): ").strip().lower()
+            redis_port = typer.prompt("Port of Redis:->").strip().lower()
+            redis_db_no = typer.prompt("Enter the Redis database number (e.g., '0', '1'): ").strip().lower()
+            want_dummy_data = typer.prompt("Do you want to load dummy data for testing? (yes/no): ").strip().lower()
+            secret_key = typer.prompt("Do you want to set your own secret key? (yes/no): ").strip().lower()
             # Create project folder
             os.makedirs(project_name, exist_ok=True)
             # Create .env file
@@ -53,24 +49,21 @@ def action():
         REDIS_PORT={redis_port}
         REDIS_DB_NUMBER={redis_db_no}
                             """
-            print(redis_db_no,redis_host,redis_port)
+            if secret_key=="yes":
+                env_content += f"\nSECRET_KEY={secret_key}"
+            elif secret_key=="no":
+                print("SECRET_KEY must be set in 'Production' ! Please configure it as an environment variable.")
+                time.sleep(2)
             with open(f"{project_name}/.env", "w") as f:
                 f.write(env_content)
-            # ✅ explicitly load the .env file you just created
+            # explicitly load the .env file you just created
             env_path = os.path.join(project_name, ".env")
             load_dotenv(dotenv_path=env_path)
-            """
-            Check Redis connection
-            """
-            starter(project_name)
-            """
-            Creating Required Files & Folders
-            """
             # Define folders and files
-            folders = ["static", "src", "tests"]
+            folders = ["static", "src", "tests", "logs"]
             files = [".gitignore", "requirements.txt", "README.md", "LICENSE"]
             # Create folders
-            print(f"📂 Creating Project Structure for: {project_name}")
+            print(f"Creating Project Structure for: {project_name}")
             time.sleep(1)
             for folder in folders:
                 folder_path = os.path.join(project_name, folder)
@@ -78,7 +71,7 @@ def action():
             # Create files
             for file in files:
                 file_path = os.path.join(project_name, file)
-                if not os.path.exists(file_path):  # avoid overwriting
+                if not os.path.exists(file_path):
                     with open(file_path, "w") as f:
                         if file == "README.md":
                             f.write("# Project Title\n\nProject description goes here.\n")
@@ -87,10 +80,23 @@ def action():
                         elif file == ".gitignore":
                             f.write("__pycache__/\n*.pyc\n.env\n")
                 else:
-                    print(f"⚠️ File already exists: {file_path}")
-            typer.echo(f"✅ Project {project_name} created with .env file \u2764 \U0001F680")
+                    print(f"File already exists: {file_path}")
+            """
+            Check Redis connection
+            """
+            starter(project_name)
+            """
+            Creating Required Files & Folders
+            """
+            if want_dummy_data=="yes":
+                from .database.db import Data
+                Data.load_data()
+                print("Loading default users and roles...")
+                time.sleep(1)
+            # If everything goes well then your have your Project Folder.
+            typer.echo(f"Project {project_name} created with .env file \u2764 \U0001F680")
         elif is_redis=="no":
-            print("Pysible requires running Redis instance in system to work...⚠️\nPlease run Redis first...⚠️")
+            print("A running Redis instance is required for Pysible to function.\nPlease start Redis before continuing.")
     except Exception as e:
         return e
 

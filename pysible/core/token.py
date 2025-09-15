@@ -1,18 +1,18 @@
 from datetime import datetime, timedelta
 from jose import jwt, JWTError
+import os
 
-SECRET_KEY = "dev_only_secret"
+DEFAULT_SECRET_KEY = ".P-L-E-A-S-E-@-C-H-A-N-G-E-@-T-H-I-S-@-K-E-Y."
+SECRET_KEY = os.getenv("SECRET_KEY", DEFAULT_SECRET_KEY)
 ALGORITHM = "HS256"
 ACCESS_EXPIRE_MIN = 30
 
 class Token:
-    def __init__(self):
-        pass
     
     @staticmethod
-    def create_token(user_id: str, password: str):
+    def create_token(user_id: str):
         expire = datetime.now() + timedelta(minutes=ACCESS_EXPIRE_MIN)
-        to_encode = {"user_id": user_id, "password": password, "exp": expire}
+        to_encode = {"user_id": user_id, "exp": expire}
         return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     
     @staticmethod

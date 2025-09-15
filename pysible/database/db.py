@@ -9,7 +9,7 @@ class Data:
             redis_client.hset("role:editor", mapping={"name": "editor"})
             redis_client.hset("role:viewer", mapping={"name": "viewer"})
         except Exception as e:
-            return {f"Failed to Load Role Data {e}"}
+            return {f"Failed to load role data: {e}"}
     
     def load_user():
         try:
@@ -22,7 +22,7 @@ class Data:
             }
         )
         except Exception as e:
-            return {f"Failed to load users {e}"}
+            return {f"Failed to load users: {e}"}
 
     @staticmethod
     def load_data():
@@ -36,41 +36,45 @@ class Data:
         try:
             Data.load_role()
             Data.load_user()
-            print("Added dafualt roles and user...")
+            print("Default roles and admin user initialized.")
         except Exception as e:
-            return {f"Failed to run LOAD DATA Function {e}"}
-        
+            return {f"Failed to execute LOAD DATA function. {e}"}
+    
     @staticmethod    
     def create_user(user_id: str, username: str, password: str, roles: list):
         for role in roles:
                 if not redis_client.hgetall(f"role:{role}"):
-                    print(f"⚠️ Please add {role} as a role first then try adding user. Use 'create_role()' for adding {role} as a role.")
+                    print(f"Role '{role}' not found. Please create the role first using create_role().")
                     return False
         if redis_client.keys(f"user_id:{user_id}"):
-            print("⚠️ User_id is already taken. Please use something else...")
+            print("User ID already exists. Please choose a different identifier.")
             return False
         try:
+            from ..logger import logger
             redis_client.hset(
                 f"user_id:{user_id}",
                 mapping={
                     "username": username,
-                    "password_hash": password,
+                    "password": password,
                     "roles": ",".join(roles) 
                 }
             )
-            print("User saved in db ✅")
+            logger.info(f"New user created. User ID: {user_id}, Username: {username}")
+            print("User successfully saved to the database.")
             return True
         except Exception as e:
-            return {f"Failed to add new user ⚠️ {e}"}
+            return {f"Failed to add new user {e}"}
     
     @staticmethod
     def create_role(role: str):
         if redis_client.keys(f"role:{role}"):
-            print("⚠️ Role exists in db. No need to create one...")
+            print("Role already exists in the database. Skipping creation.")
             return False
         try:
+            from ..logger import logger
             redis_client.hset(f"role:{role}", mapping={"name": f"{role}"})
-            print("Role saved in db ✅")
+            logger.info(f"New role created. Role: {role}")
+            print("Role successfully saved to the database.")
             return True
         except Exception as e:
             raise e
