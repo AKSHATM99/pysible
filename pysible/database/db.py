@@ -14,7 +14,7 @@ class Data:
     def load_user():
         try:
             redis_client.hset(
-            "user_id:DFU1",
+            "user_id:root",
             mapping={
                 "username": "default_user",
                 "password": "unique_password",

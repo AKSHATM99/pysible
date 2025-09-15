@@ -2,6 +2,8 @@ import os
 from dotenv import load_dotenv
 import redis
 
+load_dotenv()
+
 REDIS_HOST = os.getenv("REDIS_HOST")
 REDIS_PORT = os.getenv("REDIS_PORT")
 REDIS_DB_TO_USE = os.getenv("REDIS_DB_NUMBER")

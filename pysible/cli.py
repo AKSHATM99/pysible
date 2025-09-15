@@ -40,7 +40,7 @@ def action():
             redis_port = typer.prompt("Port of Redis:->").strip().lower()
             redis_db_no = typer.prompt("Enter the Redis database number (e.g., '0', '1'): ").strip().lower()
             want_dummy_data = typer.prompt("Do you want to load dummy data for testing? (yes/no): ").strip().lower()
-            secret_key = typer.prompt("Do you want to set your own secret key? (yes/no): ").strip().lower()
+            secret_key = typer.prompt("Do you want to set your own secret key? (Type your unique key(string) or NO): ").strip().lower()
             # Create project folder
             os.makedirs(project_name, exist_ok=True)
             # Create .env file
