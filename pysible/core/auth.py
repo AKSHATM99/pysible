@@ -1,7 +1,7 @@
 from ..database.redis_client import redis_client
 from fastapi.responses import JSONResponse
 from .token import Token
-from fastapi import HTTPException, status, Depends
+from fastapi import HTTPException, status
 from ..logger import logger
 
 class Auth:

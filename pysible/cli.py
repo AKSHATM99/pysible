@@ -58,7 +58,7 @@ def action():
                 f.write(env_content)
             # explicitly load the .env file you just created
             env_path = os.path.join(project_name, ".env")
-            load_dotenv(dotenv_path=env_path)
+            load_dotenv(dotenv_path=env_path, override=True)
             # Define folders and files
             folders = ["static", "src", "tests", "logs"]
             files = [".gitignore", "requirements.txt", "README.md", "LICENSE"]
