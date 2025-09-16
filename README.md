@@ -21,7 +21,7 @@ pip install pysible
 
 ---
 
-## 📖 Overview
+## 📖 Overview of Pysible
 Pysible is built on top of FastAPI’s `Depends` functionality.  
 
 When you install `pysible` and run:  
@@ -67,11 +67,34 @@ If Redis isn’t running, you may see:
 
 ---
 
+## 👉 Optional but recommended
+
+1- Pysible gives you the option to load dummy data into your redis db for testing purpose.<br/>
+
+2- While not required, this step provides a ready-to-use setup so you can start experimenting immediately—no need to define custom users or roles upfront.<br/>
+
+Dummy Data Format-<br/>
+```python
+Default User - { "user_id : "root",
+                    "password : "unique_password",
+                    "roles: : ["root", "admin"]
+                    }
+
+Default Roles - "role:root", mapping={"name": "root"}
+                "role:admin", mapping={"name": "admin"}
+                "role:editor", mapping={"name": "editor"}
+                "role:viewer", mapping={"name": "viewer"}
+```
+3- It is recommended to set a "UNIQUE_SECRET_KEY" otherwise you will get a warning "SECRET_KEY must be set in 'Production' ! Please configure it as an environment variable."
+
+---
+
 ## 📦 Project Structure (Generated Example)
 If setup completes successfully, you’ll get:
 ```
 my_fastapi_app/                  # Your FastAPI project
 │── src/                         # Create your endpoints & main.py here
+│── logs/                        # logs of your endpoints ( log.app file )
 │── static/                      # Optional: static files (images, docs, assets)
 │── tests/                       # Test cases
 │── requirements.txt             # Dependencies
@@ -93,7 +116,7 @@ my_fastapi_app/                  # Your FastAPI project
 ---
 
 ## ✨ Step-by-Step Guide
-
+*We’ll start with the most basic features — login and logout — and then gradually cover advanced functionalities step by step.*
 ### 1. Login / Logout
 ```python
 from fastapi import FastAPI, Depends 
@@ -110,6 +133,8 @@ async def login_func(form_data: OAuth2PasswordRequestForm = Depends()):
 async def logout_func():
     return Auth.logout()
 ```
+In the above code snippet, the `Auth class` is imported from `pysible.core`.<br/>
+Inside our `/login endpoint`, we use `OAuth2PasswordRequestForm = Depends()` because we expect the client to send a username (user_id) and password through a form.
 
 👉 Test easily using Swagger UI (`/docs`).  
 Default credentials (if dummy data loaded):  
@@ -119,6 +144,7 @@ Default credentials (if dummy data loaded):
 ---
 
 ### 2. JWT Authentication
+*JWT comes from `RBAC` in `pysible`.*
 ```python
 from fastapi import FastAPI, Depends 
 from fastapi.security import OAuth2PasswordRequestForm
@@ -129,6 +155,9 @@ app = FastAPI()
 @app.post("/login")
 def login_func(form_data: OAuth2PasswordRequestForm = Depends()):
     return Auth.login(form_data=form_data)
+
+# Pass RBAC.require_token as a dependecy in your endpoint.
+# If user is authenticated then only user is allowed to access this endpoint.
 
 @app.get("/secure_route", user=Depends(RBAC.require_token))
 def secure_endpoint():
@@ -142,6 +171,8 @@ def logout_func():
 ---
 
 ### 3. Role-Based Access Control (RBAC)
+*You can pass the list of `specific` allowed roles to the endpoints.<br/>
+Only users with `atleast one` allowed role/roles can access this endpoint.* 
 ```python
 from fastapi import FastAPI, Depends 
 from fastapi.security import OAuth2PasswordRequestForm
@@ -152,6 +183,9 @@ app = FastAPI()
 @app.post("/login")
 async def login_func(form_data: OAuth2PasswordRequestForm = Depends()):
     return Auth.login(form_data=form_data)
+
+# Pass the list of allowed of roles in the endpoint as an dependency.
+# If authenticated user has atleast one role from the list of allowed roles then only user is allowed to access this endpoint.
 
 @app.get("/secure_route", 
          user=Depends(RBAC.require_token), 
@@ -167,6 +201,8 @@ async def logout_func():
 ---
 
 ### 4. Rate Limiting
+*Rate Limiting restricts the number of times an endpoint can be called or accessed within a defined time window.*<br/>
+*It is a crucial feature in modern web applications as it helps protect your app and resources from excessive requests, unusual traffic spikes, or automated bot attacks.*
 ```python
 from fastapi import FastAPI, Depends
 from fastapi.security import OAuth2PasswordRequestForm
@@ -177,6 +213,11 @@ app = FastAPI()
 @app.post("/login")
 async def login_func(form_data: OAuth2PasswordRequestForm = Depends()):
     return Auth.login(form_data=form_data)
+
+# PyRate.rate_limiter(1, 5) means that this endpoint can be accessed 1 time per second, with a burst window capacity of 5.
+# The first number (1) represents the allowed requests per second.
+# The second number (5) represents the size of the burst window (the temporary extra capacity allowed during short traffic spikes).
+# You can change these values as per your needs.
 
 @app.get("/secure_route",
          user=Depends(RBAC.require_token),
@@ -197,6 +238,7 @@ Here:
 ---
 
 ### 5. Multiple Dependencies Together
+*If you want, you can pass all or multiple dependecies together as shown below:*
 ```python
 @app.get("/secure_route", dependencies=[
     Depends(RBAC.require_role(["root", "admin"])),
@@ -210,6 +252,8 @@ async def secure_endpoint():
 1. User has a valid JWT.  
 2. User has at least one allowed role (`root`/`admin`).  
 3. Request rate is within the allowed limit.  
+
+Only when all three conditions are satisfied, access to this endpoint is granted.
 
 ---
 
@@ -226,12 +270,6 @@ Logs are stored in `/logs/app.log`.
 
 ---
 
-## 🗄 Database Operations
-Pysible uses Redis to manage users & roles.  
-Example: adding users directly via the Redis client.  
-
----
-
 ## ✅ Summary
 Pysible provides a **ready-to-use security toolkit** for FastAPI:  
 - Authentication (JWT)  
@@ -240,5 +278,11 @@ Pysible provides a **ready-to-use security toolkit** for FastAPI:
 - Centralized Logging  
 
 With just a few lines of code, you can secure endpoints and scale safely 🚀  
+
+---
+
+## 🗄 Database Operations
+Pysible uses Redis to manage users & roles.  
+Example: adding users directly via the Redis client.  
 
 ---
