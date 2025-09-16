@@ -18,3 +18,6 @@ pysible = "pysible.cli:action"
 where = ["."]
 include = ["pysible*"]
 exclude = ["tests*", "static*"]
+
+[project.urls]
+"Homepage" = "https://github.com/AKSHATM99/pysible.git"
