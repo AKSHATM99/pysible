@@ -1,0 +1,9 @@
+include README.md
+include LICENSE
+include requirements.txt
+
+# Exclude unnecessary files
+exclude .env
+exclude .gitignore
+recursive-exclude __pycache__ *
+recursive-exclude tests *
