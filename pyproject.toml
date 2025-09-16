@@ -6,6 +6,8 @@ build-backend = "setuptools.build_meta"
 name = "pysible"
 version = "0.1.0"
 description = "Security library for FastAPI (RBAC, rate limiting, jwtAuth etc.)"
+readme = "README.md"
+license = {text = "MIT"}
 authors = [
   { name="Akshat Mishra", email="mails.akshat@gmail.com" }
 ]
