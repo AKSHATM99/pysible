@@ -1,4 +1,4 @@
-# ![Pysible Banner](static/banner2.png)
+# ![Pysible Banner](https://raw.githubusercontent.com/AKSHATM99/pysible/main/static/banner2.png)
 
 <p align="center"><b>📌 Pysible – Security Library for FastAPI</b></p>
 
